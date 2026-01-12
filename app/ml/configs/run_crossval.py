@@ -11,6 +11,7 @@ def serialize_obj(obj):
         return {"class": obj.__class__.__name__, "params": obj.__dict__}
     return str(obj)
 
+#arthur
 
 class CrossvalConfig:
 
