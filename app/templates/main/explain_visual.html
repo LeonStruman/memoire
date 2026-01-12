@@ -1,0 +1,56 @@
+{% extends "main/base_navigate.html" %}
+
+{% block app_content %}
+<br>
+<br>
+<div class="pagestyle">
+    <table class="table table-borderless">
+        <tr>
+            <td ALIGN="CENTER">
+                <h4 class="pnavbut"><b>Explanation of your predicted well-being score</b></h4>
+            </td>
+        </tr>
+        <tr>
+            <td ALIGN="LEFT">
+                <p>
+                    Your well-being score is <strong>{{ explain_dic.predicted_score }}</strong>. The radar chart highlights 
+                    <strong>{{ explain_dic.n_informative }}</strong> key aspects of your lifestyle that significantly influence this score. Let me explain how these factors contribute to your overall well-being:
+                </p>
+
+                <div class="chart-container">
+                    <img src="{{ url_for('main.radar_chart',
+                        labels=explain_dic.feature_content_dic.values() | map(attribute=0) | join(','),
+                        values=explain_dic.feature_content_dic.values() | map(attribute=4) | join(',')
+                        ) }}"
+                        alt="Radar Chart">
+                </div>
+
+                <ol>
+                    {% for question_id, question_data in explain_dic.feature_content_dic.items() %}
+                    <li>
+                        <strong>{{ question_data[0] }}</strong>: {{ question_data[1] }}
+                    </li>
+                    {% endfor %}
+                </ol>
+                <p>
+                    These factors together explain the majority of your score. The radar chart visually represents how well-balanced these areas are in your life and suggests areas where small improvements could lead to better well-being.
+                </p>
+                <p>
+                    The remaining points come from other aspects of your lifestyle and environment that are not captured in the radar chart but still contribute to your overall well-being. These might include factors like daily stress levels, diet, or work-life balance.
+                </p>
+                <p>
+                    This tool aims to help you identify which aspects of your lifestyle have the most influence on your well-being and where you might want to focus your attention to feel better overall. Small, consistent changes in these areas could make a meaningful difference.
+                </p>
+            </td>
+        </tr>
+    </table>
+    <a>
+        <form action="{{ url_for('main.satisfaction') }}" method="post">
+            <div style="text-align: left;">
+                <input type="submit" value="Next" class="btn btn-primary btn-submit">
+            </div>
+        </form>
+    </a>
+    <br>
+</div>
+{% endblock %}

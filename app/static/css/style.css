@@ -1,0 +1,256 @@
+.plabel {
+  color: rgb(64, 65, 63);
+  font-size: 25px;
+}
+
+.pnavbut {
+  color: rgb(64, 65, 63);
+  font-size: 30px;
+}
+
+.navbar-custom {
+  background-color: rgb(171, 37, 41);
+}
+
+body { 
+  background-color: rgb(50, 91, 126);
+  border-radius: 25px;
+  font-family: 'Arial', sans-serif; /* Clean and professional font */
+}
+
+.button {
+  background-color: rgb(109, 110, 109);
+  color: rgb(249, 250, 248);
+}
+
+.blocktext {
+  margin-left: auto;
+  margin-right: auto;
+  width: 6em;
+}
+
+.align {
+  text-align: center;
+}
+
+.titlecolor {
+  color: rgb(89, 108, 71);
+}
+
+.firstnavbar { 
+  background-color: rgb(255, 255, 255);
+}
+
+.secondnavbar { 
+  background-color: rgb(66, 62, 62);
+  text-align: center;
+}
+
+.secondnavbut {
+  color: rgb(245, 247, 243);
+  font-size: 20px;
+  text-transform: capitalize; /* Consistent casing for navigation */
+  padding: 10px 15px;
+}
+
+.secondnavbut:hover {
+  color: rgb(171, 37, 41); /* Hover effect for navigation links */
+  text-decoration: none; /* Prevent underline on hover */
+}
+
+.recommendations {
+  background-color: rgb(255, 255, 255);
+  border-radius: 30px;
+  padding: 20px; /* Added padding for content spacing */
+}
+
+.pagestyle {
+  background-color: rgb(255, 255, 255);
+  border-radius: 30px;
+  margin: 40px auto; /* Add margins to center content */
+  max-width: 1100px; /* Limit the width for better readability */
+  padding: 20px; /* Add padding for spacing */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for professional look */
+}
+
+.pagestyle p {
+  font-size: 1.2em; /* Increase font size for better readability */
+  line-height: 1.6; /* Improve line spacing */
+  color: rgb(64, 65, 63); /* Match content text color */
+}
+
+.pagestyle h4 {
+  font-size: 1.3em; /* Larger and bolder header */
+  color: rgb(64, 65, 63);
+  font-weight: bold;
+}
+
+.identtext {
+  text-indent: 14em;
+  color: rgb(245, 247, 243);
+  font-size: 25px;
+}
+
+.staridenttext {
+  text-indent: 1em;
+}
+
+.large-text {
+  font-size: 20px; 
+}
+
+/* new styles start */
+
+
+.likert-table {
+  margin: 40px auto;
+  max-width: 800px;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.likert-table th, .likert-table td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 10px;
+}
+
+.likert-table th {
+  background-color: #f8f9fa;
+  color: #495057;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.likert-table td input[type="radio"] {
+  width: 18px;
+  height: 18px;
+}
+
+.question-cell {
+  text-align: left;
+  font-size: 16px;
+}
+
+
+.table-container {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.btn-submit {
+  margin-top: 20px;
+  width: 100%;
+  padding: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-submit:hover {
+  background-color: #0056b3;
+}
+/* new styles end */
+
+/* Button Styling */
+.btn-primary {
+  background-color: rgb(171, 37, 41); /* Red theme for buttons */
+  border: none;
+  color: rgb(245, 247, 243);
+  font-size: 1.2em;
+  padding: 10px 20px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn-secondary {
+  background-color: rgb(171, 37, 41); /* Red theme for buttons */
+  border: none;
+  color: rgb(245, 247, 243);
+  font-size: 1.2em;
+  padding: 10px 20px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+  background-color: rgb(109, 110, 109); /* Darker hover effect */
+}
+
+.btn-retry {
+  background-color: #f39c12; /* Orange color */
+  font-size: 1em; /* Smaller font */
+  padding: 5px 15px; /* Less padding */
+  border: none;
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-retry:hover {
+  background-color: #e67e22; /* Darker orange on hover */
+}
+
+.custom-btn {
+  font-size: 1.2em;
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #007bff;
+  border: none;
+  color: white; /* Ensures text is visible */
+  cursor: pointer;
+}
+
+.custom-btn:hover {
+  background-color: #0056b3; /* Optional hover effect */
+}
+
+.site-title {
+  white-space: nowrap; /* Prevent wrapping */
+  text-align: center; /* Center the title */
+  font-size: 2em; /* Adjust font size if necessary */
+  margin: 20px 0; /* Add 20px margin on top and bottom, none on sides */
+}
+
+.range-container {
+  position: relative;
+  width: 100%; /* Ensures it uses the available width */
+  max-width: 100%; /* Prevents overflow */
+}
+
+input[type="range"] {
+  width: 100%; /* Makes the range input take up the full width of the container */
+  margin: 0; /* Removes any extra margin */
+}
+
+.tickmarks {
+  width: 100%; /* Ensures the tickmarks are aligned with the range input */
+  position: absolute;
+  top: -25px; /* Adjust to place the tickmarks just above the range input */
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.checkbox-group label {
+  font-weight: normal; /* Remove bold styling */
+}
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0; /* Optional: Add spacing above and below the image */
+}
+
+.chart-container img {
+  max-width: 100%; /* Ensures the image scales appropriately */
+  height: auto;    /* Maintains the aspect ratio */
+}

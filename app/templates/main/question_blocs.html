@@ -1,0 +1,128 @@
+    {% set grouped_questions = {} %}
+    {% set all_other_questions = [] %}
+
+    {% for question_id, (question_content, question_info_list, form_id, questionnaire_value) in questionnaire_dico.items() %}
+        {% if form_id == "likert" %}
+            {% set answers_key = questionnaire_value | map(attribute=1) | list %}
+            {% set answers_key_str = answers_key | join(',') %}
+            {% if grouped_questions.get(answers_key_str) is none %}
+                {% set _ = grouped_questions.update({answers_key_str: (question_info_list[0],[])}) %}
+            {% endif %}
+            {% set _ = grouped_questions[answers_key_str][1].append((question_id, question_content, questionnaire_value)) %}
+        {% else %}
+            {% set _ = all_other_questions.append((form_id, question_id, question_content, question_info_list, questionnaire_value)) %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="table-container">
+        <!-- Render Non-Likert Questions First -->
+        {% for form_id, question_id, question_content, question_info_list, questionnaire_value in all_other_questions %}
+            {% if form_id == "scroll" %}
+                <h4 style="margin-left: 50px;"><label for={{question_id}}>{{question_content}}</label></h4>
+                {% for question_info in question_info_list %}
+                    <p style="margin-left: 50px;">{{question_info}}</p>
+                {% endfor %}
+                <select id={{question_id}} name={{question_id}} class="large-text" style="margin-left: 50px;">
+                    <option value=""></option>
+                    {% for (answer_id, answer_content) in questionnaire_value %}
+                        <option value={{answer_id}}>{{answer_content}}</option>
+                    {% endfor %}
+                </select><br><br>
+            {% endif %}
+
+            {% if form_id == "cursor" %}
+                <h4 style="margin-left: 50px;">
+                    <label for="{{question_id}}">{{question_content}}</label>
+                </h4>
+                {% for question_info in question_info_list %}
+                    <p style="margin-left: 50px;">{{question_info}}</p>
+                {% endfor %}
+                <p style="margin-left: 50px;margin-bottom: 55px;"></p>
+                <div class="range-container" style="margin-left: 50px; width: calc(100% - 100px);">
+                    <input type="range" id="{{question_id}}" name="{{question_id}}" 
+                        min="1" max="{{ questionnaire_value | length }}" value="{% if predefined_values and predefined_values[question_id] %}{{ predefined_values[question_id][0][2] | int }}{% else %}1{% endif %}" 
+                        style="width: 100%;" step="1" list="tickmarks_{{question_id}}">
+                    <div class="tickmarks" style="position: absolute; left: 0; right: 0; display: flex; justify-content: space-between; font-size: 15px; top: -25px;">
+                        {% for (answer_id, answer_content) in questionnaire_value %}
+                            <span>{{ answer_content }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <br><br>
+            {% endif %}
+
+            {% if form_id == "checkbox" %}
+                <h4 style="margin-left: 50px;"><label for={{question_id}}>{{question_content}}</label></h4>
+                {% for question_info in question_info_list %}
+                    <p style="margin-left: 50px;">{{question_info}}</p>
+                {% endfor %}
+                <div class="checkbox-group" data-question-id="{{question_id}}" style="margin-left: 50px;">
+                    {% for (answer_id, answer_content) in questionnaire_value %}
+                        <div>
+                            <label>
+                                <input type="checkbox" id={{answer_id}} name={{question_id}}[] value={{answer_id}} />
+                                {{answer_content}}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <br><br>
+            {% endif %}
+            
+            {% if form_id == "email" %}
+                <h4 style="margin-left: 50px;"><label for={{question_id}}>{{question_content}}</label></h4>
+                {% for question_info in question_info_list %}
+                    <p style="margin-left: 50px;">{{question_info}}</p>
+                {% endfor %}
+                <input type="email" id="{{ question_id }}" name="{{ question_id }}" class="large-text" style="margin-left: 50px;" {% if not skip_valid %} required {% endif %}>
+                <br><br>
+            {% endif %}
+
+        {% endfor %}
+
+        <!-- Render Likert Questions at the End -->
+        {% for answers_key_str, (question_info, questions) in grouped_questions.items() %}
+        {% if question_info %}
+        <h4 style="margin-left: 50px;"><label for={{question_id}}>{{question_info}}</label></h4>
+        {% endif %}
+            <table class="table table-bordered table-striped likert-table">
+                <thead class="table-light">
+                    <tr>
+                        <th>Question</th>
+                        {% set answer_labels = answers_key_str.split(',') %}
+                        {% for answer_content in answer_labels %}
+                            <th>{{ answer_content }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for question_id, question_content, questionnaire_value in questions %}
+                        <tr>
+                            <td class="question-cell">{{ question_content }}</td>
+                            {% for (answer_id, answer_content) in questionnaire_value %}
+                                <td>
+                                    <input type="radio" 
+                                        name="{{ question_id }}" 
+                                        value="{{ answer_id }}"
+                                        {% if predefined_values is defined and predefined_values[question_id][0][0] == answer_id %}
+                                        checked
+                                        {% endif %}
+                                        {% if not skip_valid %} required {% endif %}
+                                    >
+                                </td>
+                            {% endfor %}
+                            <!-- Hidden input to send default value if no option is selected -->
+                            <input type="hidden" name="{{ question_id }}" value="">
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
+    </div>
+    <p>
+        Please submit your answers by clicking on this button.<br>
+        Make sure to fill out all fields before submitting.
+    </p>
+    <div style="text-align: left;">
+        <input type="submit" value="{{ button_text }}" class="btn {{ button_class }}">
+    </div>

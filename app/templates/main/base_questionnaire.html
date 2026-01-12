@@ -1,0 +1,78 @@
+<!-- base_questionnaire.html -->
+{% extends "main/base_navigate.html" %}
+
+{% block app_content %}
+<br>
+<br>
+<div class="pagestyle">
+    <table class="table table-borderless">
+        <tr> 
+            <td ALIGN="CENTER"><h4 class="pnavbut"> <b>{{ title }}</b></h4> </td>
+        </tr>
+        <tr> 
+            <td ALIGN="LEFT">
+                <p>{{ description }}</p>
+            </td>
+        </tr>
+    </table>
+    
+    <form action="{{ form_action }}" method="post">
+        <input type="hidden" name="source_page" value="{{ page_name }}">
+        <tr> 
+            <td ALIGN="LEFT">
+                <p>{{ table_description }}</p>
+                {% include 'main/question_blocs.html' %}
+            </td>
+        </tr>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>    
+
+    function validateForm() {
+
+        // For scroll questions
+        const scrollQuestions = document.querySelectorAll('select');
+        for (let i = 0; i < scrollQuestions.length; i++) {
+            if (scrollQuestions[i].value === "") {
+                return false;
+            }
+        }
+
+        // For checkbox questions
+        const checkboxGroups = document.querySelectorAll('.checkbox-group');
+        for (let i = 0; i < checkboxGroups.length; i++) {
+            const checkboxes = checkboxGroups[i].querySelectorAll('input[type="checkbox"]');
+            let isChecked = false;
+
+            // Check if at least one checkbox in the group is checked
+            for (let j = 0; j < checkboxes.length; j++) {
+                console.log(checkboxes[j].checked)
+                if (checkboxes[j].checked) {
+                    isChecked = true;
+                    break; // Exit loop if one is found checked
+                }
+            }
+
+            if (!isChecked) {
+                return false; // If no checkbox is checked in a group, return false
+            }
+        }
+
+        return true;
+    }
+
+    const skip_valid = {{ skip_valid | tojson }};  // This variable should be passed from your Flask view
+    document.querySelector('form').addEventListener('submit', function(event) {
+        if (!validateForm() && !skip_valid) {
+            alert('Please answer all questions before submitting.');
+            event.preventDefault();
+        } else {
+            window.location.href = "{{ url_for('main.intent')}}"; // Redirect to the next route
+        }
+    });
+</script> 
+
+{% endblock %}

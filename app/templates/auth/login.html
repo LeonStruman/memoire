@@ -1,0 +1,23 @@
+{% extends 'bootstrap/base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block content %}
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <h1 class = "align"> <b>Sign In</b></h1>
+    <br>
+    <div class = "align", class="row">
+        <div class = "blocktext ", class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+{% endblock %}

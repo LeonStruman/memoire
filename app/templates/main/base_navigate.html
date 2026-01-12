@@ -1,0 +1,29 @@
+{% extends 'bootstrap/base.html' %}
+
+{% block title %}
+    Datagotchi Well-being Pilot
+{% endblock %}
+
+{% block navbar %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css')}}">
+    <nav class="firstnavbar">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for('main.consent') }}">
+                    <img src="{{ url_for('static', filename='img/logo.png')}}" height="45px" alt="Logo">
+                </a>
+                <h1 class="site-title">Well-being Predictor</h1>
+            </div>
+            {% if skip_valid | default(false) %}
+            <div class="navbar-right" style="margin-top: 20px;">
+                <a href="{{ url_for('auth.close') }}" class="btn btn-danger">Logout</a>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {% block app_content %}{% endblock %}
+{% endblock %}
+

@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "datagotchi_sante"
+version = "0.1.0"
+description = ""
+authors = ["Corentin Vande Kerckhove <corentinvdk@gmail.com>"]
+package-mode = false
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.9.7 || >3.9.7,<4.0"
+pandas = "^2.2.2"
+ipykernel = "^6.29.4"
+python-dotenv = "^1.0.1"
+pyreadstat = "^1.2.7"
+black = "^24.4.2"
+isort = "^5.13.2"
+jupyter = "^1.0.0"
+notebook = "^7.2.0"
+scikit-learn = "^1.5.0"
+streamlit = "^1.35.0"
+matplotlib = "^3.9.0"
+xgboost = "^2.1.0"
+plotly = "^5.22.0"
+flask = "^3.0.3"
+flask-wtf = "^1.2.1"
+flask-sqlalchemy = "^3.1.1"
+flask-migrate = "^4.0.7"
+flask-login = "^0.6.3"
+werkzeug = "^3.0.3"
+flask-bootstrap = "^3.3.7.1"
+importlib-metadata = "^8.2.0"
+gunicorn = "^22.0.0"
+pymysql = "^1.1.1"
+cryptography = "^43.0.0"
+certbot = "^3.2.0"
+certbot-nginx = "^3.2.0"
+lightgbm = "^4.6.0"
+catboost = "^1.2.8"
+shap = "^0.47.2"
+lime = "^0.2.0.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

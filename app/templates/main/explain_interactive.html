@@ -1,0 +1,36 @@
+{% extends "main/base_navigate.html" %}
+
+{% block app_content %}
+<br>
+<br>
+<div class="pagestyle">
+    <table class="table table-borderless">
+        <tr>
+            <td ALIGN="CENTER">
+                <h4 class="pnavbut"><b>Explanation of your predicted well-being score</b></h4>
+            </td>
+        </tr>
+        <tr>
+            <td ALIGN="LEFT">
+                <p>
+                    Your well-being score is <strong>{{ explain_dic.predicted_score }}</strong>.
+                </p>
+                <form action="/explain" method="post">
+                    <input type="hidden" name="source_page" value="explain_interactive.html">
+                    {% set button_text = "Retry" %}
+                    {% set button_class = "btn-retry" %}
+                    {% include 'main/question_blocs.html'%}
+                </form> 
+            </td>
+        </tr>
+    </table>
+    <a>
+        <form action="{{ url_for('main.satisfaction') }}" method="post">
+            <div style="text-align: left;">
+                <input type="submit" value="Next" class="btn btn-primary btn-submit">
+            </div>
+        </form>
+    </a>
+    <br>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+        {% set grouped_questions = {} %}
+        {% for question_id, (question_content, question_info_list, form_id, questionnaire_value) in questionnaire_dico.items() %}
+            {% if form_id == "likert" %}
+                {% set answers_key = questionnaire_value | map(attribute=1) | list %}
+                {% set answers_key_str = answers_key | join(',') %}
+                {% if grouped_questions.get(answers_key_str) is none %}
+                    {% set _ = grouped_questions.update({answers_key_str: []}) %}
+                {% endif %}
+                {% set _ = grouped_questions[answers_key_str].append((question_id, question_content, questionnaire_value)) %}
+            {% endif %}
+        {% endfor %}
+
+        <div class="table-container">
+            {% for answers_key_str, questions in grouped_questions.items() %}
+                <table class="table table-bordered table-striped likert-table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Question</th>
+                            {% set answer_labels = answers_key_str.split(',') %}
+                            {% for answer_content in answer_labels %}
+                                <th>{{ answer_content }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for question_id, question_content, questionnaire_value in questions %}
+                            <tr>
+                                <td class="question-cell">{{ question_content }}</td>
+                                {% for answer_id, answer_content in questionnaire_value %}
+                                    <td>
+                                        <input type="radio" 
+                                               name="{{ question_id }}" 
+                                               value="{{ answer_id }}" 
+                                               {% if not skip_valid %} required {% endif %}
+                                        >
+                                    </td>
+                                {% endfor %}
+                                <!-- Hidden input to send default value if no option is selected -->
+                                <input type="hidden" name="{{ question_id }}" value="">
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <br>
+            {% endfor %}
+        </div>
+
+        <p>
+        Please submit your answers by clicking on this button.<br>
+        Make sure to fill out all fields before submitting.
+        </p>
+        <div style="text-align: left;">
+            <input type="submit" value="Next" class="btn btn-primary btn-submit">
+        </div>
