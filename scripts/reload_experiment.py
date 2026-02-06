@@ -1,25 +1,26 @@
 import csv
-import pandas as pd
-from app import create_app
-from flask import current_app
-from app.models import User, UserPII, Log, Question, Answer
-from app import db
-from config import Config as Cf
-from sqlalchemy import inspect
-from sqlalchemy.exc import NoSuchTableError
-from dotenv import load_dotenv
 import os
 from pathlib import Path
+
+import pandas as pd
+from dotenv import load_dotenv
+from flask import current_app
+from sqlalchemy import inspect
+from sqlalchemy.exc import NoSuchTableError
+
+from app import create_app, db
+from app.models import Answer, Log, Question, User, UserPII
+from config import Config as Cf
 
 # Load the .env file
 load_dotenv()
 
 app = create_app()
 
-USER_FILENAME = 'user.csv'
-USERPII_FILENAME = 'userpii.csv'
-QUESTION_FILENAME = 'question.csv'
-ANSWER_FILENAME = 'answer.csv'
+USER_FILENAME = "user.csv"
+USERPII_FILENAME = "userpii.csv"
+QUESTION_FILENAME = "question.csv"
+ANSWER_FILENAME = "answer.csv"
 
 
 def populate_db(db_name, csv_file):
@@ -55,7 +56,7 @@ def drop_tables_in_order(table_names, foreign_keys, engine):
     dependency_graph = {table: [] for table in table_names}
     for table, fks in foreign_keys.items():
         for fk in fks:
-            dependency_graph[fk['referred_table']].append(table)
+            dependency_graph[fk["referred_table"]].append(table)
 
     # Perform topological sort to get the correct order of dropping tables
     sorted_tables = topological_sort(dependency_graph)
@@ -65,7 +66,7 @@ def drop_tables_in_order(table_names, foreign_keys, engine):
     for table_name in sorted_tables:
         if inspect(db.engine).has_table(table_name):
             db.metadata.tables[table_name].drop(db.engine)
-        #engine.execute(f"DROP TABLE IF EXISTS {table_name};")
+        # engine.execute(f"DROP TABLE IF EXISTS {table_name};")
 
 
 def drop_all_tables():
@@ -88,6 +89,7 @@ def drop_all_tables():
 
     drop_tables_in_order(table_names, foreign_keys, db.engine)
 
+
 def populate_all_db():
     data_path = Path(os.getenv("DATA_WEBAPP_PATH"))
     populate_db(User, data_path / USER_FILENAME)
@@ -101,4 +103,4 @@ def reload_databases():
         drop_all_tables()
         db.create_all()
         populate_all_db()
-        print('reloaded databases with success !')
+        print("reloaded databases with success !")

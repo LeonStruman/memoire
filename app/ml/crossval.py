@@ -3,18 +3,17 @@ import os
 
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import StackingRegressor  # Import ajouté
 from sklearn.impute import KNNImputer
 from sklearn.model_selection import GridSearchCV, KFold
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import RobustScaler
-from sklearn.ensemble import StackingRegressor  # Import ajouté
 
 from app.ml.configs.run_crossval import CrossvalConfig as Config
 from app.ml.constants import Constants as C
 from app.ml.loaders import load_df_X_y, load_selected_features
 from app.ml.metrics import available_metrics_dict
 from app.ml.models import available_models_dict
-
 from app.ml.tracking import track_results
 from app.ml.utils import configure_main_logger
 
@@ -34,15 +33,21 @@ def preallocate_pipeline(model_name, param_grid):
         pipeline_steps.append(("imputer", None))
     if "scaler" in param_grid:
         pipeline_steps.append(("scaler", None))
-    
+
     if model_name == "stacking_regressor":
-        estimators = param_grid.get("regressor__estimators", [])[0]  # Récupère les estimators
+        estimators = param_grid.get("regressor__estimators", [])[
+            0
+        ]  # Récupère les estimators
         final_estimator = param_grid.get("regressor__final_estimator", [None])[0]
         cv = param_grid.get("regressor__cv", 5)
-        pipeline_steps.append((
-            "regressor",
-            StackingRegressor(estimators=estimators, final_estimator=final_estimator, cv=cv)
-        ))
+        pipeline_steps.append(
+            (
+                "regressor",
+                StackingRegressor(
+                    estimators=estimators, final_estimator=final_estimator, cv=cv
+                ),
+            )
+        )
     else:
         pipeline_steps.append(("regressor", available_models_dict[model_name]()))
 
@@ -196,7 +201,7 @@ def crossval(X, y, index, model_list):
 
 
 # Run crossval
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 def run_crossval():
     logger = configure_main_logger("crossval")
     ml_run_path = C.ML_PATH / eval(f"C.{Config.RUN_TYPE}")

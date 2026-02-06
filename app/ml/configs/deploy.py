@@ -1,3 +1,5 @@
+from catboost import CatBoostRegressor
+from sklearn.linear_model import Ridge
 from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
@@ -12,18 +14,12 @@ class DeployConfig:
 
     # Best Model
     BEST_MODEL = {
-        "model_name": "stacking_regressor",
-            "param_grid": {
-                "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
-                "scaler": [StandardScaler(), MinMaxScaler()],
-                "regressor__estimators": [
-                    [("catboost", CatBoostRegressor(depth=6, learning_rate=0.1, iterations=100)), ("ridge", Ridge(alpha=2.0))]
-                ],
-                "regressor__final_estimator": [
-                    CatBoostRegressor(depth=6, learning_rate=0.1, iterations=100),Ridge(alpha=2.0),
-                ],
-                "regressor__cv": [3],
-            },
+        "model_name": "ridge_regressor",
+        "param_grid": {
+            "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
+            "scaler": [StandardScaler(), MinMaxScaler()],
+            "regressor__alpha": [1.0, 2.0, 3.0, 4.0],
+        },
     }
     MIN_TRAIN_SIZE = 30
     TARGET_NAME = "C.TARGET_SCORE_TOT"  # TARGET_SCORE_TOT, TARGET_POSITIVE_FUNCTIONING, TARGET_EMOTIONAL_HEALTH

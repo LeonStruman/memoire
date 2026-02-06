@@ -1,4 +1,5 @@
 import streamlit as st
+
 from app.ml.configs.visuals import VisualsConfig as Config
 from app.ml.constants import Constants as C
 from app.ml.loaders import load_codebook
@@ -17,7 +18,7 @@ feature_library_path = (
 )
 
 # Feature lookup table
-#df_feature_lookup = 
+# df_feature_lookup =
 
 # Codebook
 df_codebook = load_codebook(C.CODEBOOK_PATH, Config.CODEBOOK_VERSION)

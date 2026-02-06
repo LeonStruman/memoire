@@ -1,11 +1,11 @@
 import numpy as np
 import xgboost as xgb
+from catboost import CatBoostRegressor
 from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.ensemble import StackingRegressor
 from sklearn.linear_model import Ridge
 from sklearn.tree import ExtraTreeRegressor
 from xgboost import XGBRegressor
-from catboost import CatBoostRegressor
-from sklearn.ensemble import StackingRegressor
 
 from app.ml.configs.run_crossval import CrossvalConfig as Config
 

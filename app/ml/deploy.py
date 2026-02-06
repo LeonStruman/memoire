@@ -1,9 +1,11 @@
 import argparse
 import logging
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from pathlib import Path
+import shap
+from lime.lime_tabular import LimeTabularExplainer
 from sklearn.model_selection import GridSearchCV
 
 from app.ml.configs.deploy import DeployConfig as Config
@@ -20,8 +22,6 @@ from app.ml.loaders import (
 )
 from app.ml.tracking import save_example_predictions, write_best_model, write_example
 from app.ml.utils import configure_main_logger
-import shap
-from lime.lime_tabular import LimeTabularExplainer
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ def create_questionnaire(
             C.CODEBOOK_CHOICE_COL,
         ],
     ]
-    #df_questionnaire = df_questionnaire.drop_duplicates(C.CODEBOOK_ID_COL)
+    # df_questionnaire = df_questionnaire.drop_duplicates(C.CODEBOOK_ID_COL)
     return df_questionnaire
 
 
@@ -156,41 +156,12 @@ def train_best_model(ml_run_path, frozen_library_folder_name):
     best_hyperparameters = grid_search.best_params_
     best_hyperparameters["model_name"] = model_name
 
-    # - LIME feature importances
-
-    # Create LIME explainer
-    X_train_preprocessed = best_model[:-1].transform(X_train)
-    regressor = best_model.named_steps["regressor"]
-
-    explainer = LimeTabularExplainer(
-        X_train_preprocessed,
-        feature_names=selected_features,
-        mode="regression",
-        random_state=42
+    # - coefficients
+    coefficients = best_model.named_steps["regressor"].coef_
+    feature_coeff_dict = dict(zip(selected_features, coefficients))
+    sorted_feature_coeff_dict = dict(
+        sorted(feature_coeff_dict.items(), key=lambda item: item[1], reverse=True)
     )
-
-    # Compute LIME explanations for a subset of the training data (e.g., first 100 samples or all if less)
-    n_samples = min(100, X_train_preprocessed.shape[0])
-    lime_importances = np.zeros(len(selected_features))
-
-    for i in range(n_samples):
-        exp = explainer.explain_instance(
-            X_train_preprocessed[i],
-            regressor.predict,
-            num_features=len(selected_features)
-        )
-        # exp.as_list() returns list of (feature, importance)
-        for feature, importance in exp.as_list():
-            # feature is a string like 'feature_name <= value'
-            feature_name = feature.split()[0]
-            if feature_name in selected_features:
-                idx = selected_features.index(feature_name)
-                lime_importances[idx] += abs(importance)
-
-    # Average importances over all samples
-    mean_lime_importances = lime_importances / n_samples
-    feature_coeff_dict = dict(zip(selected_features, mean_lime_importances))
-    sorted_feature_coeff_dict = dict(sorted(feature_coeff_dict.items(), key=lambda item: item[1], reverse=True))
 
     write_best_model(
         best_model,
@@ -202,7 +173,6 @@ def train_best_model(ml_run_path, frozen_library_folder_name):
         C.BEST_PARAMS_FILENAME,
         C.BEST_MODEL_COEFFICIENT_FILENAME,
     )
-
 
 
 def create_features_for_example(df_attributes_example, ml_run_path):
@@ -217,11 +187,7 @@ def create_features_for_example(df_attributes_example, ml_run_path):
     return df_features.iloc[-df_attributes_example.shape[0] :, :]
 
 
-def predict_for_example(
-    df_example,
-    model_info,
-    is_df_features = False
-):
+def predict_for_example(df_example, model_info, is_df_features=False):
     # a path is given to acces the model
     if isinstance(model_info, Path):
         ml_run_path = model_info
@@ -237,9 +203,7 @@ def predict_for_example(
 
     # if df is attributes, convert it into features
     if not is_df_features:
-        df_features_example = create_features_for_example(
-            df_example, ml_run_path
-        )
+        df_features_example = create_features_for_example(df_example, ml_run_path)
     else:
         df_features_example = df_example
 
@@ -255,11 +219,11 @@ def predict_for_example(
 
 
 # Run deploy
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 def deploy(deploy_type):
-    #parser = argparse.ArgumentParser(description="Deploy script")
-    #parser.add_argument("function", type=str, help="Function to execute")
-    #args = parser.parse_args()
+    # parser = argparse.ArgumentParser(description="Deploy script")
+    # parser.add_argument("function", type=str, help="Function to execute")
+    # args = parser.parse_args()
 
     logger = configure_main_logger("deploy")
 
@@ -279,19 +243,18 @@ def deploy(deploy_type):
     elif deploy_type == "predict_for_example":
         # Read attributes
         df_attributes_example = pd.read_csv(
-        ml_run_path / C.DEPLOY_FOLDER_NAME / C.EXAMPLE_ANSWERS_FILENAME
+            ml_run_path / C.DEPLOY_FOLDER_NAME / C.EXAMPLE_ANSWERS_FILENAME
         ).set_index(C.ATTRIBUTE_ID_COL)
-        
+
         # Predict
         df_y = predict_for_example(
             df_example=df_attributes_example,
             model_info=ml_run_path,
         )
-        
+
         # Save predictions
         save_example_predictions(
             df_y,
             ml_run_path / C.DEPLOY_FOLDER_NAME,
             C.EXAMPLE_PREDICTION_FILENAME,
         )
-

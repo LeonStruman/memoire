@@ -2,6 +2,7 @@ import json
 import pickle
 
 import pandas as pd
+
 from app.ml.constants import Constants as C
 from app.ml.utils import create_label
 

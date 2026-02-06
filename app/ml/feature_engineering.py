@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import TargetEncoder
 
-
 from app.ml.configs.create_feature import CreateFeatureConfig as Config
 from app.ml.constants import Constants as C
 from app.ml.loaders import load_attributes, load_codebook
@@ -244,7 +243,7 @@ def create_features(df_candidate_observable, df_codebook):
 
 
 # Run feature_engineering
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 def feature_engineering():
     logger = configure_main_logger("feature_engineering")
     ml_run_path = C.ML_PATH / eval(f"C.{Config.RUN_TYPE}")

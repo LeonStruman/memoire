@@ -8,14 +8,12 @@ from sklearn.feature_selection import (
     VarianceThreshold,
     f_regression,
 )
-from xgboost import XGBRegressor
-
 from sklearn.preprocessing import MinMaxScaler
+from xgboost import XGBRegressor
 
 from app.ml.configs.score_feature import ScoreFeatureConfig as Config
 from app.ml.constants import Constants as C
 from app.ml.loaders import load_df_X_y, load_feature_lookup_table
-
 from app.ml.tracking import write_selected_features
 from app.ml.utils import configure_main_logger
 
@@ -77,14 +75,18 @@ def select_k_best_features(df_X, df_y, k):
 
     # Scores
     feature_scores = selector.scores_
-    
+
     # Normalize scores
     feature_scores = score_normalization(feature_scores)
-    
+
     # Create a dataframe with features selected
     df_features = creation_feature_selected(feature_scores, df_X, k)
 
-    return df_features[C.LOOKUP_FEATURE_NAME_COL], df_features['feature_scores'], df_features['feature_selected']
+    return (
+        df_features[C.LOOKUP_FEATURE_NAME_COL],
+        df_features["feature_scores"],
+        df_features["feature_selected"],
+    )
 
 
 # Feature selection based on xgboost
@@ -107,18 +109,25 @@ def select_xgboost_features(df_X, df_y, k):
     # Create a dataframe with features selected
     df_features = creation_feature_selected(feature_scores, df_X, k)
 
-    return df_features[C.LOOKUP_FEATURE_NAME_COL], df_features['feature_scores'], df_features['feature_selected']
+    return (
+        df_features[C.LOOKUP_FEATURE_NAME_COL],
+        df_features["feature_scores"],
+        df_features["feature_selected"],
+    )
 
 
 # Create a dataframe with features selected
 def creation_feature_selected(feature_scores, df_X, k):
 
     # Create dataframe
-    dico_features = {C.LOOKUP_FEATURE_NAME_COL: df_X.columns.tolist(), 'feature_scores': feature_scores}
+    dico_features = {
+        C.LOOKUP_FEATURE_NAME_COL: df_X.columns.tolist(),
+        "feature_scores": feature_scores,
+    }
     df_features = pd.DataFrame(dico_features)
 
     # Order by scores
-    df_features_sorted = df_features.sort_values(by='feature_scores', ascending=False)
+    df_features_sorted = df_features.sort_values(by="feature_scores", ascending=False)
 
     # Derive paths from configs
     ml_run_path = C.ML_PATH / eval(f"C.{Config.RUN_TYPE}")
@@ -128,19 +137,29 @@ def creation_feature_selected(feature_scores, df_X, k):
     )
 
     # Feature lookup table
-    df_feature_lookup = load_feature_lookup_table(feature_library_path, C.FEATURE_LOOKUP_FILENAME)
+    df_feature_lookup = load_feature_lookup_table(
+        feature_library_path, C.FEATURE_LOOKUP_FILENAME
+    )
 
     # Merge the two dataframes
-    df_feature_score_lookup = df_features_sorted.merge(df_feature_lookup, on=C.LOOKUP_FEATURE_NAME_COL, how='left')
+    df_feature_score_lookup = df_features_sorted.merge(
+        df_feature_lookup, on=C.LOOKUP_FEATURE_NAME_COL, how="left"
+    )
 
     # Assert lookup table has same id
     assert ~df_feature_score_lookup[C.CODEBOOK_ID_COL].isna().any()
 
     # Count unique id
-    df_feature_score_lookup['count_unique_id_feature'] = df_feature_score_lookup[C.CODEBOOK_ID_COL].expanding().apply(lambda x: x.nunique())
+    df_feature_score_lookup["count_unique_id_feature"] = (
+        df_feature_score_lookup[C.CODEBOOK_ID_COL]
+        .expanding()
+        .apply(lambda x: x.nunique())
+    )
 
     # Select features
-    df_feature_score_lookup['feature_selected'] = (df_feature_score_lookup['count_unique_id_feature'] <= k).astype(int)
+    df_feature_score_lookup["feature_selected"] = (
+        df_feature_score_lookup["count_unique_id_feature"] <= k
+    ).astype(int)
 
     return df_feature_score_lookup
 
@@ -152,7 +171,8 @@ available_feature_selection = {
     "xgboost": select_xgboost_features,
 }
 
-#if __name__ == "__main__":
+
+# if __name__ == "__main__":
 def feature_selection():
     logger = configure_main_logger("feature_selection")
     ml_run_path = C.ML_PATH / eval(f"C.{Config.RUN_TYPE}")

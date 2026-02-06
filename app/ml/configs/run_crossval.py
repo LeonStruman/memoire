@@ -1,9 +1,9 @@
 import inspect
 
-from sklearn.impute import KNNImputer, SimpleImputer
-from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
-from sklearn.linear_model import Ridge  # Import ajouté
 from catboost import CatBoostRegressor  # Import ajouté
+from sklearn.impute import KNNImputer, SimpleImputer
+from sklearn.linear_model import Ridge  # Import ajouté
+from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 
 
 def serialize_obj(obj):
@@ -11,7 +11,8 @@ def serialize_obj(obj):
         return {"class": obj.__class__.__name__, "params": obj.__dict__}
     return str(obj)
 
-#arthur
+
+
 
 class CrossvalConfig:
 
@@ -67,32 +68,40 @@ class CrossvalConfig:
                 "regressor__alpha": [1.0, 2.0, 3.0, 4.0],
             },
         },
-        {
-            "model_name": "catboost_regressor",
-            "param_grid": {
-                "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
-                "scaler": [StandardScaler(), MinMaxScaler()],
-                "regressor__depth": [4, 6, 8],
-                "regressor__learning_rate": [0.01, 0.1, 0.2],
-                "regressor__iterations": [50, 100, 200],
-                "regressor__early_stopping_rounds": [10],
-            },
-        },
-        {
-            "model_name": "stacking_regressor",
-            "param_grid": {
-                "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
-                "scaler": [StandardScaler(), MinMaxScaler()],
-                "regressor__estimators": [
-                    [("catboost", CatBoostRegressor(depth=6, learning_rate=0.1, iterations=100)), ("ridge", Ridge(alpha=2.0))]
-                ],
-                "regressor__final_estimator": [
-                    CatBoostRegressor(depth=6, learning_rate=0.1, iterations=100),Ridge(alpha=2.0),
-                ],
-                "regressor__cv": [3],
-            },
-        },
-
+        # {
+        #     "model_name": "catboost_regressor",
+        #     "param_grid": {
+        #         "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
+        #         "scaler": [StandardScaler(), MinMaxScaler()],
+        #         "regressor__depth": [4, 6, 8],
+        #         "regressor__learning_rate": [0.01, 0.1, 0.2],
+        #         "regressor__iterations": [50, 100, 200],
+        #         "regressor__early_stopping_rounds": [10],
+        #     },
+        # },
+        # {
+        #     "model_name": "stacking_regressor",
+        #     "param_grid": {
+        #         "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
+        #         "scaler": [StandardScaler(), MinMaxScaler()],
+        #         "regressor__estimators": [
+        #             [
+        #                 (
+        #                     "catboost",
+        #                     CatBoostRegressor(
+        #                         depth=6, learning_rate=0.1, iterations=100
+        #                     ),
+        #                 ),
+        #                 ("ridge", Ridge(alpha=2.0)),
+        #             ]
+        #         ],
+        #         "regressor__final_estimator": [
+        #             CatBoostRegressor(depth=6, learning_rate=0.1, iterations=100),
+        #             Ridge(alpha=2.0),
+        #         ],
+        #         "regressor__cv": [3],
+        #     },
+        # },
     ]
     TARGET_NAME = "C.TARGET_SCORE_TOT"  # TARGET_SCORE_TOT, TARGET_POSITIVE_FUNCTIONING, TARGET_EMOTIONAL_HEALTH
     TARGET_BORNE_SUP = (

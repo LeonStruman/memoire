@@ -2,12 +2,14 @@ import os
 
 import plotly.express as px
 import streamlit as st
+
 from app.ml.configs.visuals import VisualsConfig as Config
 from app.ml.constants import Constants as C
 from app.ml.loaders import load_scores_features
 from app.ml.visuals import menu
 
 ###################### Functions  ########################
+
 
 ### Select a feature library
 def select_feature_library(feature_selection_path):
@@ -22,6 +24,7 @@ def select_feature_library(feature_selection_path):
         "Choose the feature library you want to see", feature_library_list_sorted
     )
     return selected_feature_library
+
 
 ### Function to select the feature selection method
 def select_feature_selection_method(feature_selection_library_path):
@@ -142,11 +145,12 @@ def plot_feature_selection_scores(
     # Plot results
     st.plotly_chart(fig)
 
+
 ###################### Preloading  ########################
 
 # Derive paths from configs
 ml_run_path = C.ML_PATH / eval(f"C.{Config.RUN_TYPE}")
-feature_selection_path = (ml_run_path / C.FEATURE_SELECTION_FOLDER_NAME)
+feature_selection_path = ml_run_path / C.FEATURE_SELECTION_FOLDER_NAME
 
 
 ###################### Content page ##########################
@@ -159,7 +163,7 @@ st.title("Feature Selection")
 
 # Selection of feature library
 selected_feature_library = select_feature_library(feature_selection_path)
-feature_selection_library_path = (feature_selection_path / selected_feature_library)
+feature_selection_library_path = feature_selection_path / selected_feature_library
 
 # Selection of feature selection method and loading scores of the features
 selected_feature_selection_method, df_features_scores_sorted = (

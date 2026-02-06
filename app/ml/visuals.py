@@ -14,7 +14,7 @@ def menu():
             icon="📈",
         )
         st.page_link("pages/visuals_experiments.py", label="Experiments", icon="⚙️")
-        #st.page_link("pages/visuals_constraints.py", label="Constraints on features", icon="🎛️")
+        # st.page_link("pages/visuals_constraints.py", label="Constraints on features", icon="🎛️")
 
 
 ############### Streamlit launch ###############

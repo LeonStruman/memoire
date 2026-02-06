@@ -229,16 +229,13 @@ def write_example(
     # Create directory if missing
     Path(deploy_path).mkdir(parents=True, exist_ok=True)
 
-    df_questionnaire.to_csv(deploy_path / questionnaire_filename, index=False, sep=';')
+    df_questionnaire.to_csv(deploy_path / questionnaire_filename, index=False, sep=";")
     logger.info("Questionnaire saved !")
 
     df_example.to_csv(deploy_path / example_filename)
     logger.info("Example saved !")
 
-    df_feature_names = pd.DataFrame(
-        df_example.columns,
-        columns=['feature_names']
-    )
+    df_feature_names = pd.DataFrame(df_example.columns, columns=["feature_names"])
     df_feature_names.to_csv(
         deploy_path / deploy_feature_names_filename,
         index=False,
@@ -269,6 +266,7 @@ def write_best_model(
     with open(deploy_path / best_model_coefficient_filename, "w") as json_file:
         json.dump(feature_coeff_dict, json_file, indent=4, cls=CustomEncoder)
     logger.info("Model coefficients saved !")
+
 
 def save_example_predictions(df_y, path, filename):
     df_y.to_csv(path / filename)
