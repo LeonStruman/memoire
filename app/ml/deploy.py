@@ -156,41 +156,41 @@ def train_best_model(ml_run_path, frozen_library_folder_name):
     best_hyperparameters = grid_search.best_params_
     best_hyperparameters["model_name"] = model_name
 
-    # - LIME feature importances
+    # - SHAP feature importances
 
-    # Create LIME explainer
+    # Preprocess training data (everything before the regressor in the pipeline)
     X_train_preprocessed = best_model[:-1].transform(X_train)
     regressor = best_model.named_steps["regressor"]
 
-    explainer = LimeTabularExplainer(
-        X_train_preprocessed,
-        feature_names=selected_features,
-        mode="regression",
-        random_state=42
-    )
-
-    # Compute LIME explanations for a subset of the training data (e.g., first 100 samples or all if less)
+    # Number of samples to explain
     n_samples = min(100, X_train_preprocessed.shape[0])
-    lime_importances = np.zeros(len(selected_features))
+    X_explain = X_train_preprocessed[:n_samples]
 
-    for i in range(n_samples):
-        exp = explainer.explain_instance(
-            X_train_preprocessed[i],
-            regressor.predict,
-            num_features=len(selected_features)
-        )
-        # exp.as_list() returns list of (feature, importance)
-        for feature, importance in exp.as_list():
-            # feature is a string like 'feature_name <= value'
-            feature_name = feature.split()[0]
-            if feature_name in selected_features:
-                idx = selected_features.index(feature_name)
-                lime_importances[idx] += abs(importance)
+    try:
+        # Try the unified SHAP explainer (auto-selects best explainer)
+        explainer = shap.Explainer(regressor, X_train_preprocessed, feature_names=selected_features)
+        shap_values = explainer(X_explain).values
+    except Exception:
+        # Fallback to KernelExplainer if auto explainer fails (slower)
+        background_size = min(50, X_train_preprocessed.shape[0])
+        background = shap.sample(X_train_preprocessed, background_size, random_state=42)
+        explainer = shap.KernelExplainer(lambda x: regressor.predict(x), background)
+        shap_values = np.array(explainer.shap_values(X_explain))
+        # KernelExplainer.shap_values may return list for multilabel; handle that
+        if isinstance(shap_values, list):
+            shap_values = np.array(shap_values[0])
 
-    # Average importances over all samples
-    mean_lime_importances = lime_importances / n_samples
-    feature_coeff_dict = dict(zip(selected_features, mean_lime_importances))
-    sorted_feature_coeff_dict = dict(sorted(feature_coeff_dict.items(), key=lambda item: item[1], reverse=True))
+    # Ensure shap_values is (n_samples, n_features)
+    if shap_values.ndim == 3:
+        # e.g., (n_samples, n_outputs, n_features) -> take first output
+        shap_values = shap_values[:, 0, :]
+
+    # Mean absolute SHAP value per feature
+    mean_abs_shap = np.mean(np.abs(shap_values), axis=0)
+    feature_coeff_dict = dict(zip(selected_features, mean_abs_shap))
+    sorted_feature_coeff_dict = dict(
+        sorted(feature_coeff_dict.items(), key=lambda item: item[1], reverse=True)
+    )
 
     write_best_model(
         best_model,
