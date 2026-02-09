@@ -5,7 +5,8 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import GridSearchCV
-
+from catboost import CatBoostRegressor 
+from sklearn.linear_model import Ridge
 from app.ml.configs.deploy import DeployConfig as Config
 from app.ml.constants import Constants as C
 from app.ml.crossval import preallocate_pipeline, scaling_y
@@ -14,7 +15,7 @@ from app.ml.loaders import (
     load_attributes,
     load_best_model,
     load_codebook,
-    load_df_X_y,
+    load_df_X_y, 
     load_feature_lookup_table,
     load_selected_features,
 )

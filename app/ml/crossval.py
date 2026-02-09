@@ -14,7 +14,6 @@ from app.ml.constants import Constants as C
 from app.ml.loaders import load_df_X_y, load_selected_features
 from app.ml.metrics import available_metrics_dict
 from app.ml.models import available_models_dict
-
 from app.ml.tracking import track_results
 from app.ml.utils import configure_main_logger
 
