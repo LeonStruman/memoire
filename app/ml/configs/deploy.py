@@ -1,6 +1,7 @@
 from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
-
+from catboost import CatBoostRegressor
+from sklearn.linear_model import Ridge
 
 class DeployConfig:
     RUN_TYPE = "REAL_FOLDER_NAME"  # SANDBOX_FOLDER_NAME or REAL_FOLDER_NAME
