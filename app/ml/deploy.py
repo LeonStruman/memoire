@@ -157,40 +157,44 @@ def train_best_model(ml_run_path, frozen_library_folder_name):
     best_hyperparameters = grid_search.best_params_
     best_hyperparameters["model_name"] = model_name
 
-    # - SHAP feature importances
-
+    # - SHAP local explanation for the 10th person (index 9)
     # Preprocess training data (everything before the regressor in the pipeline)
     X_train_preprocessed = best_model[:-1].transform(X_train)
     regressor = best_model.named_steps["regressor"]
 
-    # Number of samples to explain
-    n_samples = min(100, X_train_preprocessed.shape[0])
-    X_explain = X_train_preprocessed[:n_samples]
+    # Choose the 10th sample (use last available if fewer than 10 samples)
+    sample_idx = 9
+    if X_train_preprocessed.shape[0] <= sample_idx:
+        sample_idx = X_train_preprocessed.shape[0] - 1
+    X_local = X_train_preprocessed[sample_idx : sample_idx + 1]
 
     try:
         # Try the unified SHAP explainer (auto-selects best explainer)
         explainer = shap.Explainer(regressor, X_train_preprocessed, feature_names=selected_features)
-        shap_values = explainer(X_explain).values
+        shap_out = explainer(X_local)
+        shap_values_local = shap_out.values
     except Exception:
         # Fallback to KernelExplainer if auto explainer fails (slower)
         background_size = min(50, X_train_preprocessed.shape[0])
         background = shap.sample(X_train_preprocessed, background_size, random_state=42)
         explainer = shap.KernelExplainer(lambda x: regressor.predict(x), background)
-        shap_values = np.array(explainer.shap_values(X_explain))
-        # KernelExplainer.shap_values may return list for multilabel; handle that
-        if isinstance(shap_values, list):
-            shap_values = np.array(shap_values[0])
+        shap_values_local = np.array(explainer.shap_values(X_local))
+        if isinstance(shap_values_local, list):
+            shap_values_local = np.array(shap_values_local[0])
 
-    # Ensure shap_values is (n_samples, n_features)
-    if shap_values.ndim == 3:
-        # e.g., (n_samples, n_outputs, n_features) -> take first output
-        shap_values = shap_values[:, 0, :]
+    # Normalize shape: want 1D array of length n_features
+    if shap_values_local.ndim == 3:
+        # (1, n_outputs, n_features) -> take first output
+        shap_values_local = shap_values_local[0, 0, :]
+    elif shap_values_local.ndim == 2:
+        # (1, n_features)
+        shap_values_local = shap_values_local[0, :]
+    # else ndim==1 already
 
-    # Mean absolute SHAP value per feature
-    mean_abs_shap = np.mean(np.abs(shap_values), axis=0)
-    feature_coeff_dict = dict(zip(selected_features, mean_abs_shap))
+    # Create dict of signed contributions and sort by absolute contribution (descending)
+    feature_local_contrib = dict(zip(selected_features, shap_values_local))
     sorted_feature_coeff_dict = dict(
-        sorted(feature_coeff_dict.items(), key=lambda item: item[1], reverse=True)
+        sorted(feature_local_contrib.items(), key=lambda item: abs(item[1]), reverse=True)
     )
 
     write_best_model(
