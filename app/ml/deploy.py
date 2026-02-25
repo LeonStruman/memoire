@@ -152,46 +152,60 @@ def train_best_model(ml_run_path, frozen_library_folder_name):
 
     best_model.fit(X_train, y_train)
 
-    # Additional info
-    # - hyperparameters
+    # Hyperparamètres choisis
     best_hyperparameters = grid_search.best_params_
     best_hyperparameters["model_name"] = model_name
 
-    # - SHAP local explanation for the 10th person (index 9)
-    # Preprocess training data (everything before the regressor in the pipeline)
-    X_train_preprocessed = best_model[:-1].transform(X_train)
+    # Préparer les données prétraitées (tout avant le régresseur dans le pipeline)
+    try:
+        X_train_preprocessed = best_model[:-1].transform(X_train)
+    except Exception:
+        # Si la transformation échoue, supposer que X_train est déjà prétraité
+        X_train_preprocessed = X_train
+
     regressor = best_model.named_steps["regressor"]
 
-    # Choose the 10th sample (use last available if fewer than 10 samples)
+    # Index de la 10ème personne (indice 9)
     sample_idx = 9
     if X_train_preprocessed.shape[0] <= sample_idx:
-        sample_idx = X_train_preprocessed.shape[0] - 1
+        sample_idx = max(0, X_train_preprocessed.shape[0] - 1)
     X_local = X_train_preprocessed[sample_idx : sample_idx + 1]
 
+    # Calcul des valeurs SHAP localement pour l'échantillon choisi
+    shap_values_local = None
     try:
-        # Try the unified SHAP explainer (auto-selects best explainer)
-        explainer = shap.Explainer(regressor, X_train_preprocessed, feature_names=selected_features)
-        shap_out = explainer(X_local)
-        shap_values_local = shap_out.values
+        # Essayer TreeExplainer pour modèles d'arbres (ex. CatBoost, XGBoost, LightGBM)
+        explainer = shap.TreeExplainer(regressor)
+        shap_out = explainer.shap_values(X_local)
+        shap_values_local = np.array(shap_out)
     except Exception:
-        # Fallback to KernelExplainer if auto explainer fails (slower)
-        background_size = min(50, X_train_preprocessed.shape[0])
-        background = shap.sample(X_train_preprocessed, background_size, random_state=42)
-        explainer = shap.KernelExplainer(lambda x: regressor.predict(x), background)
-        shap_values_local = np.array(explainer.shap_values(X_local))
-        if isinstance(shap_values_local, list):
-            shap_values_local = np.array(shap_values_local[0])
+        try:
+            # Essayer l'explainer générique (auto)
+            explainer = shap.Explainer(regressor, X_train_preprocessed, feature_names=selected_features)
+            shap_out = explainer(X_local)
+            shap_values_local = np.array(shap_out.values)
+        except Exception:
+            # Dernier recours : KernelExplainer (lent mais robuste)
+            background_size = min(50, max(1, X_train_preprocessed.shape[0]))
+            background = shap.sample(X_train_preprocessed, background_size, random_state=42)
+            explainer = shap.KernelExplainer(lambda x: regressor.predict(x), background)
+            shap_vals = explainer.shap_values(X_local)
+            shap_values_local = np.array(shap_vals)
+            if isinstance(shap_values_local, list):
+                shap_values_local = np.array(shap_values_local[0])
 
-    # Normalize shape: want 1D array of length n_features
-    if shap_values_local.ndim == 3:
-        # (1, n_outputs, n_features) -> take first output
+    # Normaliser la forme en vecteur 1D de longueur n_features
+    if shap_values_local is None:
+        # Si tout a échoué, définir contributions à zéro
+        shap_values_local = np.zeros(len(selected_features))
+    elif shap_values_local.ndim == 3:
+        # (1, n_outputs, n_features) -> prendre premier output
         shap_values_local = shap_values_local[0, 0, :]
     elif shap_values_local.ndim == 2:
-        # (1, n_features)
+        # (1, n_features) -> aplatir
         shap_values_local = shap_values_local[0, :]
-    # else ndim==1 already
 
-    # Create dict of signed contributions and sort by absolute contribution (descending)
+    # Dictionnaire des contributions signées triées par contribution absolue décroissante
     feature_local_contrib = dict(zip(selected_features, shap_values_local))
     sorted_feature_coeff_dict = dict(
         sorted(feature_local_contrib.items(), key=lambda item: abs(item[1]), reverse=True)
