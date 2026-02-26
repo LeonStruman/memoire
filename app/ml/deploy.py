@@ -165,7 +165,42 @@ def train_best_model(ml_run_path, frozen_library_folder_name):
 
     regressor = best_model.named_steps["regressor"]
 
-    # Index de la 10ème personne (indice 9)
+    # LIME local explanation pour la 10ème personne (indice 9)
+    sample_idx = 9
+    if X_train_preprocessed.shape[0] <= sample_idx:
+        sample_idx = max(0, X_train_preprocessed.shape[0] - 1)
+    X_local = X_train_preprocessed[sample_idx : sample_idx + 1]
+
+    # Créer l'explainer LIME
+    explainer = LimeTabularExplainer(
+        training_data=X_train_preprocessed,
+        feature_names=selected_features,
+        mode="regression",
+        random_state=42
+    )
+    
+    # Obtenir l'explication locale LIME
+    lime_explanation = explainer.explain_instance(
+        data_row=X_local[0],
+        predict_fn=regressor.predict,
+        num_features=len(selected_features)
+    )
+    
+    # Extraire les contributions LIME
+    feature_local_contrib = dict(lime_explanation.as_list())
+    
+    # Nettoyer les noms de features et créer le dictionnaire final
+    sorted_feature_coeff_dict = {}
+    for feature_name, contrib in feature_local_contrib.items():
+        # Extraire le nom de la feature (avant le <=, >, etc.)
+        clean_name = feature_name.split()[0]
+        if clean_name in selected_features:
+            sorted_feature_coeff_dict[clean_name] = contrib
+    
+    # Trier par contribution absolue décroissante
+    sorted_feature_coeff_dict = dict(
+        sorted(sorted_feature_coeff_dict.items(), key=lambda item: abs(item[1]), reverse=True)
+    )
     sample_idx = 9
     if X_train_preprocessed.shape[0] <= sample_idx:
         sample_idx = max(0, X_train_preprocessed.shape[0] - 1)
