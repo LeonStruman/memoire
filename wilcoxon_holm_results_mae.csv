@@ -1,0 +1,5 @@
+Comparison,Wilcoxon statistic,Raw p-value,Mean MAE Stacking,Mean MAE compared model,Mean difference (Stacking - compared),Folds won by Stacking,Folds won by compared model,Ties,Holm-corrected p-value,Significant after Holm correction
+Stacking Regressor vs CatBoost Regressor,1.0,0.0625,13.961459999999999,14.0362,-0.07473999999999954,4,1,0,0.125,False
+Stacking Regressor vs LightGBM Regressor,0.0,0.03125,13.961459999999999,14.2625,-0.3010399999999997,5,0,0,0.125,False
+Stacking Regressor vs Ridge Regressor,0.0,0.03125,13.961459999999999,14.37002,-0.4085599999999999,5,0,0,0.125,False
+Stacking Regressor vs Support Vector Regressor,0.0,0.03125,13.961459999999999,14.45908,-0.49761999999999984,5,0,0,0.125,False

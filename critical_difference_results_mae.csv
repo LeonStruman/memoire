@@ -1,0 +1,12 @@
+Comparison,Rank difference,Significant by CD
+Stacking Regressor vs CatBoost Regressor,1.0000000000000002,False
+Stacking Regressor vs LightGBM Regressor,2.5999999999999996,False
+Stacking Regressor vs Ridge Regressor,3.8,False
+Stacking Regressor vs Support Vector Regressor,4.3,False
+Stacking Regressor vs XGBoost Regressor,4.8,False
+Stacking Regressor vs ElasticNet Regressor,5.6,False
+Stacking Regressor vs Random Forest Regressor,5.8,False
+Stacking Regressor vs MLP Regressor,6.8999999999999995,False
+Stacking Regressor vs KNN Regressor,8.200000000000001,True
+Stacking Regressor vs Mean Regressor,9.8,True
+Stacking Regressor vs Random Regressor,10.8,True

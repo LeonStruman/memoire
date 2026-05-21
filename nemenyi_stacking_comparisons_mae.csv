@@ -1,0 +1,12 @@
+Comparison,p-value,Significant at 0.05
+Stacking Regressor vs Random Regressor,0.0001378855655281841,True
+Stacking Regressor vs Mean Regressor,0.001046846935427781,True
+Stacking Regressor vs KNN Regressor,0.016895667872609543,True
+Stacking Regressor vs MLP Regressor,0.10105433772541961,False
+Stacking Regressor vs Random Forest Regressor,0.3126975364115798,False
+Stacking Regressor vs ElasticNet Regressor,0.3682994874319172,False
+Stacking Regressor vs XGBoost Regressor,0.6192374736018289,False
+Stacking Regressor vs Support Vector Regressor,0.7684944788702424,False
+Stacking Regressor vs Ridge Regressor,0.8835161469977371,False
+Stacking Regressor vs LightGBM Regressor,0.9928728938334284,False
+Stacking Regressor vs CatBoost Regressor,0.9999993995490238,False

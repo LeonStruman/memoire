@@ -1,0 +1,13 @@
+,Stacking Regressor,CatBoost Regressor,LightGBM Regressor,Ridge Regressor,Support Vector Regressor,XGBoost Regressor,ElasticNet Regressor,Random Forest Regressor,MLP Regressor,KNN Regressor,Mean Regressor,Random Regressor
+Stacking Regressor,,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+CatBoost Regressor,1.0,,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+LightGBM Regressor,1.0,1.0,,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+Ridge Regressor,1.0,1.0,1.0,,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+Support Vector Regressor,1.0,1.0,1.0,1.0,,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+XGBoost Regressor,1.0,1.0,1.0,1.0,1.0,,1.0,1.0,1.0,1.0,1.0,1.0
+ElasticNet Regressor,1.0,1.0,1.0,1.0,1.0,1.0,,1.0,1.0,1.0,1.0,1.0
+Random Forest Regressor,1.0,1.0,1.0,1.0,1.0,1.0,1.0,,1.0,1.0,1.0,1.0
+MLP Regressor,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,,1.0,1.0,1.0
+KNN Regressor,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,,1.0,1.0
+Mean Regressor,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,,1.0
+Random Regressor,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,

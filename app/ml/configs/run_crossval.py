@@ -67,6 +67,16 @@ class CrossvalConfig:
             },
         },
         {
+            "model_name": "lightgbm_regressor",
+            "param_grid": {
+                "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
+                "scaler": [StandardScaler(), MinMaxScaler()],
+                "regressor__num_leaves": [31, 50, 100],
+                "regressor__learning_rate": [0.01, 0.1, 0.2],
+                "regressor__n_estimators": [50, 100, 200],
+            },
+        },
+        {
             "model_name": "catboost_regressor",
             "param_grid": {
                 "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],

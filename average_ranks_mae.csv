@@ -1,0 +1,13 @@
+,0
+Stacking Regressor,1.2
+CatBoost Regressor,2.2
+LightGBM Regressor,3.8
+Ridge Regressor,5.0
+Support Vector Regressor,5.5
+XGBoost Regressor,6.0
+ElasticNet Regressor,6.8
+Random Forest Regressor,7.0
+MLP Regressor,8.1
+KNN Regressor,9.4
+Mean Regressor,11.0
+Random Regressor,12.0

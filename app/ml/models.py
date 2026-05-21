@@ -8,6 +8,7 @@ from catboost import CatBoostRegressor
 from sklearn.ensemble import StackingRegressor
 
 from app.ml.configs.run_crossval import CrossvalConfig as Config
+import lightgbm as lgb
 
 
 class MeanRegressor(BaseEstimator, RegressorMixin):
@@ -99,5 +100,6 @@ available_models_dict = {
     "xgboost_regressor": XGBRegressor,
     "ridge_regressor": Ridge,
     "catboost_regressor": CatBoostRegressor,
+    "lightgbm_regressor": lgb.LGBMRegressor,
     "stacking_regressor": StackingRegressor,
 }

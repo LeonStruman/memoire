@@ -1,0 +1,13 @@
+,Stacking Regressor,CatBoost Regressor,LightGBM Regressor,Ridge Regressor,Support Vector Regressor,XGBoost Regressor,ElasticNet Regressor,Random Forest Regressor,MLP Regressor,KNN Regressor,Mean Regressor,Random Regressor
+Stacking Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,**,***,***
+CatBoost Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,*,***,***
+LightGBM Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,*,**
+Ridge Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,*
+Support Vector Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.
+XGBoost Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.
+ElasticNet Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.
+Random Forest Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.
+MLP Regressor,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.
+KNN Regressor,**,*,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.
+Mean Regressor,***,***,*,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.
+Random Regressor,***,***,**,*,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.,n.s.
