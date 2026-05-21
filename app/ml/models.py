@@ -5,6 +5,7 @@ from sklearn.linear_model import Ridge
 from sklearn.tree import ExtraTreeRegressor
 from xgboost import XGBRegressor
 from catboost import CatBoostRegressor
+from lightgbm import LGBMRegressor
 from sklearn.ensemble import StackingRegressor
 
 from app.ml.configs.run_crossval import CrossvalConfig as Config
@@ -99,5 +100,6 @@ available_models_dict = {
     "xgboost_regressor": XGBRegressor,
     "ridge_regressor": Ridge,
     "catboost_regressor": CatBoostRegressor,
+    "lightgbm_regressor": LGBMRegressor,
     "stacking_regressor": StackingRegressor,
 }
