@@ -1,6 +1,8 @@
 from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 from lightgbm import LGBMRegressor
+from catboost import CatBoostRegressor
+from sklearn.linear_model import Ridge
 
 class DeployConfig:
     RUN_TYPE = "REAL_FOLDER_NAME"  # SANDBOX_FOLDER_NAME or REAL_FOLDER_NAME
@@ -12,14 +14,15 @@ class DeployConfig:
 
     # Best Model
     BEST_MODEL = {
-        "model_name": "lightgbm_regressor",
-        "param_grid": {
-            "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
-            "regressor__n_estimators": [50, 200],
-            "regressor__learning_rate": [0.01, 0.1],
-            "regressor__num_leaves": [31, 50],
-            "regressor__min_child_samples": [20, 40],
-        },
+        "model_name": "catboost_regressor",
+            "param_grid": {
+                "imputer": [SimpleImputer(strategy="mean"), KNNImputer()],
+                "scaler": [StandardScaler(), MinMaxScaler()],
+                "regressor__depth": [4, 6, 8],
+                "regressor__learning_rate": [0.01, 0.1, 0.2],
+                "regressor__iterations": [50, 100, 200],
+                "regressor__early_stopping_rounds": [10],
+            },
     }
     MIN_TRAIN_SIZE = 30
     TARGET_NAME = "C.TARGET_SCORE_TOT"  # TARGET_SCORE_TOT, TARGET_POSITIVE_FUNCTIONING, TARGET_EMOTIONAL_HEALTH

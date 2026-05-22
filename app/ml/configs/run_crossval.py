@@ -3,7 +3,7 @@ import inspect
 from sklearn.impute import KNNImputer, SimpleImputer
 from sklearn.preprocessing import MinMaxScaler, RobustScaler, StandardScaler
 from sklearn.linear_model import Ridge  # Import ajouté
-from catboost import CatBoostRegressor  # Import ajouté
+from catboost import CatBoostRegressor # Import ajouté
 
 
 def serialize_obj(obj):

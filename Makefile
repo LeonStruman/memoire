@@ -25,6 +25,9 @@ generate-example:
 predict-for-example:
 	poetry run python -c "from app.ml.deploy import deploy; deploy('predict_for_example')"
 
+preprocess-example:
+	poetry run python -c "from app.ml.deploy import deploy; deploy('preprocess_example')"
+
 run-crossval:
 	poetry run python -c "from app.ml.crossval import run_crossval; run_crossval()"
 

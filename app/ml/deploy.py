@@ -184,44 +184,44 @@ def train_best_model(ml_run_path, frozen_library_folder_name):
     # Utiliser le premier exemple pour l'explication locale
     X_local = X_example_preprocessed[0:1]
 
-    # Calcul des valeurs SHAP localement pour l'échantillon choisi
-    shap_values_local = None
-    try:
-        # Essayer TreeExplainer pour modèles d'arbres (ex. CatBoost, XGBoost, LightGBM)
-        explainer = shap.TreeExplainer(regressor)
-        shap_out = explainer.shap_values(X_local)
-        shap_values_local = np.array(shap_out)
-    except Exception:
-        try:
-            # Essayer l'explainer générique (auto)
-            explainer = shap.Explainer(regressor, X_train_preprocessed, feature_names=selected_features)
-            shap_out = explainer(X_local)
-            shap_values_local = np.array(shap_out.values)
-        except Exception:
-            # Dernier recours : KernelExplainer (lent mais robuste)
-            background_size = min(50, max(1, X_train_preprocessed.shape[0]))
-            background = shap.sample(X_train_preprocessed, background_size, random_state=42)
-            explainer = shap.KernelExplainer(lambda x: regressor.predict(x), background)
-            shap_vals = explainer.shap_values(X_local)
-            shap_values_local = np.array(shap_vals)
-            if isinstance(shap_values_local, list):
-                shap_values_local = np.array(shap_values_local[0])
+        # Calcul d'une explication LIME locale pour l'échantillon choisi
+    # On utilise les données d'entraînement prétraitées comme base de référence
+    lime_explainer = LimeTabularExplainer(
+        training_data=X_train_preprocessed,
+        feature_names=selected_features,
+        mode="regression",
+        discretize_continuous=True,
+        random_state=42,
+    )
 
-    # Normaliser la forme en vecteur 1D de longueur n_features
-    if shap_values_local is None:
-        # Si tout a échoué, définir contributions à zéro
-        shap_values_local = np.zeros(len(selected_features))
-    elif shap_values_local.ndim == 3:
-        # (1, n_outputs, n_features) -> prendre premier output
-        shap_values_local = shap_values_local[0, 0, :]
-    elif shap_values_local.ndim == 2:
-        # (1, n_features) -> aplatir
-        shap_values_local = shap_values_local[0, :]
+    # LIME explique une instance 1D, donc on prend X_local[0]
+    lime_exp = lime_explainer.explain_instance(
+        data_row=X_local[0],
+        predict_fn=regressor.predict,
+        num_features=len(selected_features),
+    )
+
+    # Récupérer les contributions LIME sous forme de dictionnaire
+    # exp.as_map()[1] correspond généralement à la sortie en régression
+    lime_weights = lime_exp.as_map()[1]
+
+    feature_local_contrib = {
+        selected_features[feature_idx]: weight
+        for feature_idx, weight in lime_weights
+    }
+
+    # Ajouter les features absentes de l'explication avec une contribution nulle
+    # pour garder le même format que précédemment
+    for feature in selected_features:
+        feature_local_contrib.setdefault(feature, 0.0)
 
     # Dictionnaire des contributions signées triées par contribution absolue décroissante
-    feature_local_contrib = dict(zip(selected_features, shap_values_local))
     sorted_feature_coeff_dict = dict(
-        sorted(feature_local_contrib.items(), key=lambda item: abs(item[1]), reverse=True)
+        sorted(
+            feature_local_contrib.items(),
+            key=lambda item: abs(item[1]),
+            reverse=True,
+        )
     )
 
     write_best_model(
@@ -247,6 +247,41 @@ def create_features_for_example(df_attributes_example, ml_run_path):
     )
     df_features, _ = create_features(df_attributes_with_example, df_codebook)
     return df_features.iloc[-df_attributes_example.shape[0] :, :]
+
+
+def preprocess_example_values(df_example, model_info, is_df_features=False):
+    if isinstance(model_info, Path):
+        ml_run_path = model_info
+        best_model, selected_features = load_best_model(
+            ml_run_path / C.DEPLOY_FOLDER_NAME,
+            C.BEST_MODEL_FILENAME,
+        )
+    elif isinstance(model_info, tuple):
+        best_model, selected_features = model_info
+        ml_run_path = None
+    else:
+        raise ValueError(
+            "model_info must be a Path or a (best_model, selected_features) tuple"
+        )
+
+    if not is_df_features:
+        if ml_run_path is None:
+            raise ValueError(
+                "ml_run_path is required when df_example contains raw attributes"
+            )
+        df_features_example = create_features_for_example(df_example, ml_run_path)
+    else:
+        df_features_example = df_example
+
+    assert all(col in df_features_example.columns for col in selected_features)
+    X = df_features_example[selected_features].values
+    X_preprocessed = best_model[:-1].transform(X)
+
+    return pd.DataFrame(
+        X_preprocessed,
+        index=df_features_example.index,
+        columns=selected_features,
+    )
 
 
 def predict_for_example(
@@ -326,4 +361,16 @@ def deploy(deploy_type):
             ml_run_path / C.DEPLOY_FOLDER_NAME,
             C.EXAMPLE_PREDICTION_FILENAME,
         )
-
+    elif deploy_type == "preprocess_example":
+        df_attributes_example = pd.read_csv(
+            ml_run_path / C.DEPLOY_FOLDER_NAME / C.EXAMPLE_ANSWERS_FILENAME,
+            index_col=C.ATTRIBUTE_ID_COL,
+        )
+        df_preprocessed = preprocess_example_values(
+            df_example=df_attributes_example,
+            model_info=ml_run_path,
+        )
+        df_preprocessed.to_csv(
+            ml_run_path / C.DEPLOY_FOLDER_NAME / C.EXAMPLE_PREPROCESSED_FILENAME
+        )
+        logger.info("Preprocessed example values written with success !")

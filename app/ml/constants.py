@@ -48,6 +48,7 @@ class Constants:
     BEST_MODEL_COEFFICIENT_FILENAME = "model_coefficients.json"
     BEST_PARAMS_FILENAME = "model_details.json"
     EXAMPLE_PREDICTION_FILENAME = "example_predictions.csv"
+    EXAMPLE_PREPROCESSED_FILENAME = "example_preprocessed.csv"
 
     # Codebook fields
     CODEBOOK_ID_COL = "id"
